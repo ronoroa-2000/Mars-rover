@@ -3,3 +3,4 @@ install/
 log/
 *.pdf
 *.csv
+.vscode/
