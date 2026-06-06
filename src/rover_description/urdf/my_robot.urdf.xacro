@@ -8,6 +8,10 @@
     <!-- <xacro:arg name="serial_port" default="/dev/ttyACM0" /> -->
     <!-- <xacro:property name="serial_port" value="$(arg serial_port)" /> -->
 
+    <!-- Flip right wheel joint axes for RViz display only; pass invert_right_wheels:=true
+         in the display description and leave it false for the hardware description. -->
+    <xacro:arg name="invert_right_wheels" default="false"/>
+
     <xacro:include filename="common_properties.xacro" />
     <xacro:include filename="aries_gazebo.xacro" />
     <xacro:include filename="aries_base.xacro" />

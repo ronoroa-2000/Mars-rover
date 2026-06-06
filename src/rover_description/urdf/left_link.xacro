@@ -42,7 +42,7 @@
     </joint>
 
     <!-- Left Wheel 1 -->
-    <link name="L_1_Wheel_Link">
+    <link name="L_3_Wheel_Link">
         <inertial>
             <origin xyz="0 0 0.0350608778434713" rpy="0 0 0"/>
             <mass value="${wheel_mass}"/>
@@ -57,7 +57,7 @@
         <visual>
             <origin xyz="0 0 0" rpy="0 0 0"/>
             <geometry>
-                <mesh filename="${mesh_location}/L_1_Wheel_Link.STL"/>
+                <mesh filename="${mesh_location}/L_3_Wheel_Link.STL"/>
             </geometry>
             <material name="blue"/>
         </visual>
@@ -70,10 +70,10 @@
     </link>
 
     <!-- Left Wheel 1 Joint -->
-    <joint name="L_1_Wheel_Joint" type="continuous">
+    <joint name="L_3_Wheel_Joint" type="continuous">
         <origin xyz="0.14142135623731 0.141421356237309 -0.08667" rpy="0 0 0"/>
         <parent link="L_Boggie_Link"/>
-        <child link="L_1_Wheel_Link"/>
+        <child link="L_3_Wheel_Link"/>
         <axis xyz="0 0 -1"/>
         <dynamics damping="0.01" friction="0.01"/>
     </joint>
@@ -116,7 +116,7 @@
     </joint>
 
     <!-- Left Wheel 3 -->
-    <link name="L_3_Wheel_Link">
+    <link name="L_1_Wheel_Link">
         <inertial>
             <origin xyz="0 0 0.0350608778434703" rpy="0 0 0"/>
             <mass value="${wheel_mass}"/>
@@ -131,7 +131,7 @@
         <visual>
             <origin xyz="0 0 0" rpy="0 0 0"/>
             <geometry>
-                <mesh filename="${mesh_location}/L_3_Wheel_Link.STL"/>
+                <mesh filename="${mesh_location}/L_1_Wheel_Link.STL"/>
             </geometry>
             <material name="blue"/>
         </visual>
@@ -144,10 +144,10 @@
     </link>
 
     <!-- Left Wheel 3 Joint -->
-    <joint name="L_3_Wheel_Joint" type="continuous">
+    <joint name="L_1_Wheel_Joint" type="continuous">
         <origin xyz="-0.261 0.1785 -0.0759999999999989" rpy="0 0 0"/>
         <parent link="L_Rocker_Link"/>
-        <child link="L_3_Wheel_Link"/>
+        <child link="L_1_Wheel_Link"/>
         <axis xyz="0 0 -1"/>
         <dynamics damping="0.01" friction="0.01"/>
     </joint>

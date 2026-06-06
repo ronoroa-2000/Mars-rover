@@ -6,7 +6,11 @@
 
   <!-- Gazebo Materials -->
   <gazebo reference="base_link">
-    <material>Gazebo/Gray</material>
+    <material>
+      <ambient>0.7 0.7 0.7 1</ambient>
+      <diffuse>0.7 0.7 0.7 1</diffuse>
+      <specular>0.1 0.1 0.1 1</specular>
+    </material>
     <mu1>0.2</mu1>
     <mu2>0.2</mu2>
     <kp>1000000.0</kp>
@@ -55,64 +59,88 @@
   </gazebo>
   
   <gazebo reference="L_1_Wheel_Link">
-    <material>Gazebo/Black</material>
-    <mu1>1.0</mu1>
-    <mu2>1.0</mu2>
+    <material>
+      <ambient>0.05 0.05 0.05 1</ambient>
+      <diffuse>0.05 0.05 0.05 1</diffuse>
+      <specular>0.01 0.01 0.01 1</specular>
+    </material>
+    <mu1>2.0</mu1>
+    <mu2>2.0</mu2>
     <kp>1000000.0</kp>
     <kd>100.0</kd>
     <minDepth>0.001</minDepth>
     <maxVel>0.1</maxVel>
     <fdir1>1 0 0</fdir1>
   </gazebo>
-  
+
   <gazebo reference="L_2_Wheel_Link">
-    <material>Gazebo/Black</material>
-    <mu1>1.0</mu1>
-    <mu2>1.0</mu2>
+    <material>
+      <ambient>0.05 0.05 0.05 1</ambient>
+      <diffuse>0.05 0.05 0.05 1</diffuse>
+      <specular>0.01 0.01 0.01 1</specular>
+    </material>
+    <mu1>2.0</mu1>
+    <mu2>2.0</mu2>
     <kp>1000000.0</kp>
     <kd>100.0</kd>
     <minDepth>0.001</minDepth>
     <maxVel>0.1</maxVel>
     <fdir1>1 0 0</fdir1>
   </gazebo>
-  
+
   <gazebo reference="L_3_Wheel_Link">
-    <material>Gazebo/Black</material>
-    <mu1>1.0</mu1>
-    <mu2>1.0</mu2>
+    <material>
+      <ambient>0.05 0.05 0.05 1</ambient>
+      <diffuse>0.05 0.05 0.05 1</diffuse>
+      <specular>0.01 0.01 0.01 1</specular>
+    </material>
+    <mu1>2.0</mu1>
+    <mu2>2.0</mu2>
     <kp>1000000.0</kp>
     <kd>100.0</kd>
     <minDepth>0.001</minDepth>
     <maxVel>0.1</maxVel>
     <fdir1>1 0 0</fdir1>
   </gazebo>
-  
+
   <gazebo reference="R_1_Wheel_Link">
-    <material>Gazebo/Black</material>
-    <mu1>1.0</mu1>
-    <mu2>1.0</mu2>
+    <material>
+      <ambient>0.05 0.05 0.05 1</ambient>
+      <diffuse>0.05 0.05 0.05 1</diffuse>
+      <specular>0.01 0.01 0.01 1</specular>
+    </material>
+    <mu1>2.0</mu1>
+    <mu2>2.0</mu2>
     <kp>1000000.0</kp>
     <kd>100.0</kd>
     <minDepth>0.001</minDepth>
     <maxVel>0.1</maxVel>
     <fdir1>1 0 0</fdir1>
   </gazebo>
-  
+
   <gazebo reference="R_2_Wheel_Link">
-    <material>Gazebo/Black</material>
-    <mu1>1.0</mu1>
-    <mu2>1.0</mu2>
+    <material>
+      <ambient>0.05 0.05 0.05 1</ambient>
+      <diffuse>0.05 0.05 0.05 1</diffuse>
+      <specular>0.01 0.01 0.01 1</specular>
+    </material>
+    <mu1>2.0</mu1>
+    <mu2>2.0</mu2>
     <kp>1000000.0</kp>
     <kd>100.0</kd>
     <minDepth>0.001</minDepth>
     <maxVel>0.1</maxVel>
     <fdir1>1 0 0</fdir1>
   </gazebo>
-  
+
   <gazebo reference="R_3_Wheel_Link">
-    <material>Gazebo/Black</material>
-    <mu1>1.0</mu1>
-    <mu2>1.0</mu2>
+    <material>
+      <ambient>0.05 0.05 0.05 1</ambient>
+      <diffuse>0.05 0.05 0.05 1</diffuse>
+      <specular>0.01 0.01 0.01 1</specular>
+    </material>
+    <mu1>2.0</mu1>
+    <mu2>2.0</mu2>
     <kp>1000000.0</kp>
     <kd>100.0</kd>
     <minDepth>0.001</minDepth>
@@ -291,7 +319,7 @@
       <publish_link_pose>true</publish_link_pose>
       <use_pose_vector_msg>true</use_pose_vector_msg>
       <static_publisher>true</static_publisher>
-      <static_update_frequency>60</static_update_frequency>
+      <static_update_frequency>100</static_update_frequency>
     </plugin>
   </gazebo>
 
@@ -304,14 +332,14 @@
             <odom_topic>/odom</odom_topic>
             <!-- <tf_topic>/model/aries/tf</tf_topic> -->
             <dimensions>2</dimensions>
-            <odom_publish_frequency>60</odom_publish_frequency>
+            <odom_publish_frequency>100</odom_publish_frequency>
         </plugin>
   </gazebo>
     
   <gazebo reference="imu_frame">
       <sensor name="imu_sensor" type="imu">
           <always_on>1</always_on>
-          <update_rate>60</update_rate>
+          <update_rate>100</update_rate>
           <gz_frame_id>imu_frame</gz_frame_id>
           <visualize>true</visualize>
           <topic>/imu</topic>
@@ -338,14 +366,6 @@
     </gazebo>
   </xacro:unless>
 
-  <!-- gz_ros2_control: creates controller_manager inside Gazebo when use_sim=true -->
-  <xacro:if value="$(arg use_sim)">
-    <gazebo>
-      <plugin filename="gz_ros2_control-system" name="gz_ros2_control::GazeboSimROS2ControlPlugin">
-        <parameters>$(find rover_controllers)/config/diff_controller.yaml</parameters>
-      </plugin>
-    </gazebo>
-  </xacro:if>
 
   
 

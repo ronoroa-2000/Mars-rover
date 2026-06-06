@@ -1,15 +1,15 @@
 teleop_twist_joy:
   ros__parameters:
-    enable_button: 4
+    enable_button: 7
     require_enable_button: true
 
     publish_stamped_twist: true
 
     axis_linear:
-      x: 4
+      x: 0
 
     axis_angular:
-      yaw: 0
+      yaw: 3
 
     scale_linear:
       x: 0.5

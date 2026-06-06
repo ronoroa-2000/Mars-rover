@@ -24,7 +24,7 @@ install(PROGRAMS
 
 install(PROGRAMS
   Launch/controller_launch.py
- 
+  scripts/hardware_interface.py
   DESTINATION lib/${PROJECT_NAME}
 )
 

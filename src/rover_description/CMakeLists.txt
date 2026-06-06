@@ -9,7 +9,7 @@ endif()
 find_package(ament_cmake REQUIRED)
 
 install(
-  DIRECTORY urdf launch config meshes rviz models worlds sdf
+  DIRECTORY urdf launch config meshes rviz models worlds 
   DESTINATION share/${PROJECT_NAME}/
 )
 
@@ -19,7 +19,7 @@ install(
 
 
 install(PROGRAMS
-  scripts/virtual_differential
+  scripts/virtual_differential.py
   scripts/waypoint_follower.py
   scripts/teleop_keyboard.py
  

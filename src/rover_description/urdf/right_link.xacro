@@ -48,7 +48,7 @@
     
 
     <!-- Right Wheel 1 -->
-    <link name="R_1_Wheel_Link">
+    <link name="R_3_Wheel_Link">
         <inertial>
             <origin xyz="0 0 0.0350608778434713" rpy="0 0 0"/>
             <mass value="${wheel_mass}"/>
@@ -63,7 +63,7 @@
         <visual>
             <origin xyz="0 0 0" rpy="0 0 0"/>
             <geometry>
-                <mesh filename="${mesh_location}/R_1_Wheel_Link.STL"/>
+                <mesh filename="${mesh_location}/R_3_Wheel_Link.STL"/>
             </geometry>
             <material name="blue"/>
         </visual>
@@ -76,11 +76,16 @@
     </link>
 
     <!-- Right Wheel 1 Joint -->
-    <joint name="R_1_Wheel_Joint" type="continuous">
+    <joint name="R_3_Wheel_Joint" type="continuous">
         <origin xyz="0.1542 -0.1266 -0.086" rpy="0 0 0"/>
         <parent link="R_Boggie_Link"/>
-        <child link="R_1_Wheel_Link"/>
-        <axis xyz="0 0 1"/>
+        <child link="R_3_Wheel_Link"/>
+        <xacro:if value="$(arg invert_right_wheels)">
+            <axis xyz="0 0 -1"/>
+        </xacro:if>
+        <xacro:unless value="$(arg invert_right_wheels)">
+            <axis xyz="0 0 1"/>
+        </xacro:unless>
         <dynamics damping="0.01" friction="0.01"/>
     </joint>
 
@@ -117,12 +122,17 @@
         <origin xyz="-0.1267 -0.1545 -0.086" rpy="0 0 0"/>
         <parent link="R_Boggie_Link"/>
         <child link="R_2_Wheel_Link"/>
-        <axis xyz="0 0 1"/>
+        <xacro:if value="$(arg invert_right_wheels)">
+            <axis xyz="0 0 -1"/>
+        </xacro:if>
+        <xacro:unless value="$(arg invert_right_wheels)">
+            <axis xyz="0 0 1"/>
+        </xacro:unless>
         <dynamics damping="0.01" friction="0.01"/>
     </joint>
 
     <!-- Right Wheel 3 -->
-    <link name="R_3_Wheel_Link">
+    <link name="R_1_Wheel_Link">
         <inertial>
             <origin xyz="0 0 0.0350608778434713" rpy="0 0 0"/>
             <mass value="${wheel_mass}"/>
@@ -137,7 +147,7 @@
         <visual>
             <origin xyz="0 0 0" rpy="0 0 0"/>
             <geometry>
-                <mesh filename="${mesh_location}/R_3_Wheel_Link.STL"/>
+                <mesh filename="${mesh_location}/R_1_Wheel_Link.STL"/>
             </geometry>
             <material name="blue"/>
         </visual>
@@ -150,11 +160,16 @@
     </link>
 
     <!-- Right Wheel 3 Joint -->
-    <joint name="R_3_Wheel_Joint" type="continuous">
+    <joint name="R_1_Wheel_Joint" type="continuous">
         <origin xyz="-0.276 -0.1541 -0.0760000000000001" rpy="0 0 0"/>
         <parent link="R_Rocker_Link"/>
-        <child link="R_3_Wheel_Link"/>
-        <axis xyz="0 0 1"/>
+        <child link="R_1_Wheel_Link"/>
+        <xacro:if value="$(arg invert_right_wheels)">
+            <axis xyz="0 0 -1"/>
+        </xacro:if>
+        <xacro:unless value="$(arg invert_right_wheels)">
+            <axis xyz="0 0 1"/>
+        </xacro:unless>
         <dynamics damping="0.01" friction="0.01"/>
     </joint>
 

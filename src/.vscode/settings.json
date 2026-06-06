@@ -8,5 +8,9 @@
         "/home/vighnesh/ros2_ws/install/my_py_pkg/lib/python3.12/site-packages",
         "/opt/ros/jazzy/lib/python3.12/site-packages"
     ],
-    "cmake.sourceDirectory": "/home/vighnesh/ros2_ws/src/rover_description"
+    "cmake.sourceDirectory": "/home/zoro/Mars-rover/src/rover_controllers",
+    "cmake.configureArgs": [
+        "-DCMAKE_C_COMPILER=/usr/bin/gcc",
+        "-DCMAKE_CXX_COMPILER=/usr/bin/g++"
+    ]
 }
