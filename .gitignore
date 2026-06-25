@@ -4,6 +4,6 @@ log/
 *.pdf
 *.csv
 .vscode/
-src/bno055/
-src/ros_odrive/
-src/rover_nav/
+bno055/
+ros_odrive/
+rover_nav/
