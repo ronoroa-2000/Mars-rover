@@ -9,6 +9,7 @@ Brings up the full real-rover stack:
   - rover_controller         (diff_drive_controller, odom TF enabled for RViz)
   - joy_node                 (gamepad input)
   - teleop_twist_joy         (joy → /rover_controller/cmd_vel)
+  - ekf_node                 (robot_localization, rover_nav/config/ekf_config.yaml)
   - rviz2                    (display_config.rviz for motion tracking)
 
 CAN interface is can0 (hardcoded in rover_control.xacro).
@@ -47,6 +48,10 @@ def generate_launch_description():
 
     joy_teleop_yaml = PathJoinSubstitution([
         FindPackageShare('rover_controllers'), 'config', 'joyTeleop.yaml'
+    ])
+
+    ekf_config_yaml = PathJoinSubstitution([
+        FindPackageShare('rover_nav'), 'config', 'ekf_config.yaml'
     ])
 
     rviz_config = PathJoinSubstitution([
@@ -190,6 +195,18 @@ def generate_launch_description():
     )
 
     # ------------------------------------------------------------------
+    # EKF — fuses wheel odometry + IMU into a filtered odom estimate
+    # ------------------------------------------------------------------
+
+    ekf_node = Node(
+        package='robot_localization',
+        executable='ekf_node',
+        name='ekf_filter_node',
+        output='screen',
+        parameters=[ekf_config_yaml],
+    )
+
+    # ------------------------------------------------------------------
     # RViz2  — tracks robot model and odometry in real time
     # ------------------------------------------------------------------
 
@@ -217,6 +234,9 @@ def generate_launch_description():
         # Joystick control
         joy_node,
         teleop_node,
+
+        # State estimation
+        ekf_node,
 
         # Visualisation
         rviz_node,
