@@ -4,8 +4,6 @@ import rclpy
 from rclpy.node import Node
 from sensor_msgs.msg import JointState
 from nav_msgs.msg import Odometry
-from geometry_msgs.msg import TransformStamped
-from tf2_ros import TransformBroadcaster
 
 WHEEL_RADIUS     = 0.110   # m
 WHEEL_SEPARATION = 0.665   # m
@@ -23,7 +21,6 @@ class WeightedOdometry(Node):
         super().__init__('weighted_odometry')
 
         self.odom_pub = self.create_publisher(Odometry, '/odom', 10)
-        self.tf_broadcaster = TransformBroadcaster(self)
 
         self.create_subscription(JointState, '/joint_states', self.joint_states_cb, 10)
 
@@ -94,16 +91,6 @@ class WeightedOdometry(Node):
         odom.twist.twist.linear.x  = v
         odom.twist.twist.angular.z = w
         self.odom_pub.publish(odom)
-
-        tf = TransformStamped()
-        tf.header.stamp    = stamp.to_msg()
-        tf.header.frame_id = 'odom'
-        tf.child_frame_id  = 'base_footprint'
-        tf.transform.translation.x = self.x
-        tf.transform.translation.y = self.y
-        tf.transform.rotation.z    = qz
-        tf.transform.rotation.w    = qw
-        self.tf_broadcaster.sendTransform(tf)
 
 
 def main(args=None):

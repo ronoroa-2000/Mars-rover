@@ -198,6 +198,14 @@ def generate_launch_description():
     # EKF — fuses wheel odometry + IMU into a filtered odom estimate
     # ------------------------------------------------------------------
 
+    weighted_odom_node = Node(
+        package='rover_controllers',
+        executable='weighted_odometry.py',
+        name='weighted_odometry',
+        output='screen',
+        remappings=[('/odom', '/rover_controller/odom_median')],
+    )
+
     ekf_node = Node(
         package='robot_localization',
         executable='ekf_node',
@@ -236,6 +244,7 @@ def generate_launch_description():
         teleop_node,
 
         # State estimation
+        weighted_odom_node,
         ekf_node,
 
         # Visualisation
