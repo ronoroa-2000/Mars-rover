@@ -99,7 +99,9 @@
 
   <!-- ================================================================
        REAL HARDWARE  (ODrive S1 x6 via CAN bus)
-       Velocity limits: ±11.52 rad/s (110 RPM rated, r=0.110 m → ~1.27 m/s)
+       Velocity limits: ±25 rad/s (motor rated for 110 RPM / ~11.52 rad/s —
+                         raised past rating, confirm ODrive vel_limit and
+                         motor/gearbox can sustain this before running)
        Effort limits  : ±5 Nm (motor rated torque)
        ================================================================ -->
   <xacro:unless value="$(arg use_sim)">
@@ -115,8 +117,8 @@
       <joint name="L_1_Wheel_Joint">
         <param name="node_id">3</param>
         <command_interface name="velocity">
-          <param name="min">-11.52</param>
-          <param name="max"> 11.52</param>
+          <param name="min">-50</param>
+          <param name="max"> 50</param>
         </command_interface>
         <command_interface name="effort">
           <param name="min">-5</param>
@@ -130,8 +132,8 @@
       <joint name="L_2_Wheel_Joint">
         <param name="node_id">4</param>
         <command_interface name="velocity">
-          <param name="min">-11.52</param>
-          <param name="max"> 11.52</param>
+          <param name="min">-50</param>
+          <param name="max"> 50</param>
         </command_interface>
         <command_interface name="effort">
           <param name="min">-5</param>
@@ -145,8 +147,8 @@
       <joint name="L_3_Wheel_Joint">
         <param name="node_id">5</param>
         <command_interface name="velocity">
-          <param name="min">-11.52</param>
-          <param name="max"> 11.52</param>
+          <param name="min">-50</param>
+          <param name="max"> 50</param>
         </command_interface>
         <command_interface name="effort">
           <param name="min">-5</param>
@@ -161,8 +163,8 @@
       <joint name="R_1_Wheel_Joint">
         <param name="node_id">2</param>
         <command_interface name="velocity">
-          <param name="min">-11.52</param>
-          <param name="max"> 11.52</param>
+          <param name="min">-50</param>
+          <param name="max"> 50</param>
         </command_interface>
         <command_interface name="effort">
           <param name="min">-5</param>
@@ -176,8 +178,8 @@
       <joint name="R_2_Wheel_Joint">
         <param name="node_id">1</param>
         <command_interface name="velocity">
-          <param name="min">-11.52</param>
-          <param name="max"> 11.52</param>
+          <param name="min">-50</param>
+          <param name="max"> 50</param>
         </command_interface>
         <command_interface name="effort">
           <param name="min">-5</param>
@@ -191,8 +193,8 @@
       <joint name="R_3_Wheel_Joint">
         <param name="node_id">0</param>
         <command_interface name="velocity">
-          <param name="min">-11.52</param>
-          <param name="max"> 11.52</param>
+          <param name="min">-50</param>
+          <param name="max"> 50</param>
         </command_interface>
         <command_interface name="effort">
           <param name="min">-5</param>

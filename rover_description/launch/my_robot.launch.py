@@ -26,7 +26,7 @@ from launch_ros.actions import Node
 from launch_ros.substitutions import FindPackageShare
 from launch_ros.parameter_descriptions import ParameterValue
 
-from ament_index_python.packages import get_package_share_directory, get_package_prefix
+from ament_index_python.packages import get_package_share_directory, get_package_prefix, PackageNotFoundError
 
 
 def generate_launch_description():
@@ -36,7 +36,10 @@ def generate_launch_description():
     # ------------------------------------------------------------------
 
     rover_description_share = get_package_share_directory('rover_description')
-    gz_ros2_control_lib = os.path.join(get_package_prefix('gz_ros2_control'), 'lib')
+    try:
+        gz_ros2_control_lib = os.path.join(get_package_prefix('gz_ros2_control'), 'lib')
+    except PackageNotFoundError:
+        gz_ros2_control_lib = None
 
     # ------------------------------------------------------------------
     # Paths
@@ -59,7 +62,11 @@ def generate_launch_description():
     ])
 
     world_path = PathJoinSubstitution([
-        FindPackageShare('rover_description'), 'worlds', 'marsyard.sdf'
+        FindPackageShare('rover_description'), 'worlds', 'empty_world.sdf'
+    ])
+
+    ekf_config_path = PathJoinSubstitution([
+        FindPackageShare('rover_nav'), 'config', 'ekf_config.yaml'
     ])
 
     # ------------------------------------------------------------------
@@ -114,9 +121,14 @@ def generate_launch_description():
     # NVIDIA GPU — PRIME render offload for hybrid-graphics laptops
     # ------------------------------------------------------------------
 
+    gz_sim_system_plugin_path_value = [EnvironmentVariable('GZ_SIM_SYSTEM_PLUGIN_PATH', default_value='')]
+    if gz_ros2_control_lib is not None:
+        gz_sim_system_plugin_path_value.insert(0, ':')
+        gz_sim_system_plugin_path_value.insert(0, gz_ros2_control_lib)
+
     set_gz_sim_plugin_path = SetEnvironmentVariable(
         name='GZ_SIM_SYSTEM_PLUGIN_PATH',
-        value=[gz_ros2_control_lib, ':', EnvironmentVariable('GZ_SIM_SYSTEM_PLUGIN_PATH', default_value='')]
+        value=gz_sim_system_plugin_path_value
     )
 
     set_nvidia_prime = SetEnvironmentVariable(name='__NV_PRIME_RENDER_OFFLOAD', value='1')
@@ -132,7 +144,10 @@ def generate_launch_description():
     # ------------------------------------------------------------------
 
     robot_description_content = ParameterValue(
-        Command(['xacro ', urdf_path, ' use_sim:=', use_sim]),
+        Command([
+            'xacro ', urdf_path,
+            ' use_sim:=', use_sim
+        ]),
         value_type=str
     )
 
@@ -241,18 +256,17 @@ def generate_launch_description():
     )
 
     # ------------------------------------------------------------------
-    # Delay controller spawning
-    #   sim  : after spawn_robot exits (gz_ros2_control is then ready)
-    #   real : after ros2_control_node starts (ODrive hardware interface ready)
+    # Controller spawn sequencing
+    #   sim  : joint_state_broadcaster after spawn_robot exits (gz_ros2_control is then ready)
+    #   real : joint_state_broadcaster after ros2_control_node starts (ODrive hardware interface ready)
+    #   both : rover_controller only after joint_state_broadcaster has actually
+    #          finished loading/activating (event-driven, no fixed wall-clock guess)
     # ------------------------------------------------------------------
 
     delay_controllers_after_spawn = RegisterEventHandler(
         event_handler=OnProcessExit(
             target_action=spawn_robot_node,
-            on_exit=[
-                joint_state_broadcaster_spawner,
-                TimerAction(period=3.0, actions=[rover_controller_spawner]),
-            ]
+            on_exit=[joint_state_broadcaster_spawner]
         ),
         condition=IfCondition(use_sim)
     )
@@ -260,12 +274,16 @@ def generate_launch_description():
     delay_controllers_after_ros2_control = RegisterEventHandler(
         event_handler=OnProcessStart(
             target_action=ros2_control_node,
-            on_start=[
-                joint_state_broadcaster_spawner,
-                TimerAction(period=3.0, actions=[rover_controller_spawner]),
-            ]
+            on_start=[joint_state_broadcaster_spawner]
         ),
         condition=UnlessCondition(use_sim)
+    )
+
+    rover_controller_after_joint_state_broadcaster = RegisterEventHandler(
+        event_handler=OnProcessExit(
+            target_action=joint_state_broadcaster_spawner,
+            on_exit=[rover_controller_spawner]
+        )
     )
 
 
@@ -318,6 +336,14 @@ def generate_launch_description():
         OnProcessStart(target_action=teleop_node, on_start=[LogInfo(msg='[STARTED] teleop_twist_joy is up')])
     )
 
+    ekf_node = Node(
+        package='robot_localization',
+        executable='ekf_node',
+        name='ekf_filter_node',
+        output='screen',
+        parameters=[ekf_config_path, {'use_sim_time': use_sim_time}],
+    )
+
     # ------------------------------------------------------------------
     # Launch description
     # ------------------------------------------------------------------
@@ -352,9 +378,15 @@ def generate_launch_description():
         ros2_control_node,
         delay_controllers_after_ros2_control,
 
+        # --- Controller spawn sequencing (shared) ---
+        rover_controller_after_joint_state_broadcaster,
+
         # --- Joystick + teleop ---
         joy_node,
         teleop_node,
         joy_started_handler,
         teleop_started_handler,
+
+        # --- State estimation ---
+        ekf_node,
     ])
