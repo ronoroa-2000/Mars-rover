@@ -37,20 +37,18 @@ building:
 | Package | Source | Purpose |
 |---|---|---|
 | [ros_odrive](https://github.com/odriverobotics/ros_odrive) | odriverobotics | ROS 2 driver for ODrive motor controllers, used by `rover_controllers` to drive the wheel motors over CAN. |
-| [bno055](https://github.com/flynneva/bno055) | flynneva | ROS 2 driver for the BNO055 IMU, used for orientation/odometry input. |
 | [rover_nav](https://github.com/ronoroa-2000/rover_nav) | ronoroa-2000 | Navigation stack for the rover. |
 
 ```bash
-cd ~/Mars-rover/src
+cd ~/mars-rover/src
 git clone https://github.com/odriverobotics/ros_odrive.git
-git clone https://github.com/flynneva/bno055.git
 git clone https://github.com/ronoroa-2000/rover_nav.git
 ```
 
 ## Building
 
 ```bash
-cd ~/Mars-rover
+cd ~/mars-rover
 colcon build
 source install/setup.bash
 ```

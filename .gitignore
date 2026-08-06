@@ -1,9 +1,8 @@
 build/
 install/
 log/
+__pycache__/
 *.pdf
 *.csv
 .vscode/
-bno055/
-ros_odrive/
 rover_nav/

@@ -116,6 +116,7 @@
       <!-- LEFT WHEELS -->
       <joint name="L_1_Wheel_Joint">
         <param name="node_id">3</param>
+        <param name="direction">1</param>
         <command_interface name="velocity">
           <param name="min">-50</param>
           <param name="max"> 50</param>
@@ -131,6 +132,7 @@
 
       <joint name="L_2_Wheel_Joint">
         <param name="node_id">4</param>
+        <param name="direction">1</param>
         <command_interface name="velocity">
           <param name="min">-50</param>
           <param name="max"> 50</param>
@@ -146,6 +148,7 @@
 
       <joint name="L_3_Wheel_Joint">
         <param name="node_id">5</param>
+        <param name="direction">1</param>
         <command_interface name="velocity">
           <param name="min">-50</param>
           <param name="max"> 50</param>
@@ -162,6 +165,7 @@
       <!-- RIGHT WHEELS -->
       <joint name="R_1_Wheel_Joint">
         <param name="node_id">2</param>
+        <param name="direction">-1</param>
         <command_interface name="velocity">
           <param name="min">-50</param>
           <param name="max"> 50</param>
@@ -177,6 +181,7 @@
 
       <joint name="R_2_Wheel_Joint">
         <param name="node_id">1</param>
+        <param name="direction">-1</param>
         <command_interface name="velocity">
           <param name="min">-50</param>
           <param name="max"> 50</param>
@@ -192,6 +197,7 @@
 
       <joint name="R_3_Wheel_Joint">
         <param name="node_id">0</param>
+        <param name="direction">-1</param>
         <command_interface name="velocity">
           <param name="min">-50</param>
           <param name="max"> 50</param>

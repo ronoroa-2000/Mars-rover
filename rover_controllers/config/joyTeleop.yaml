@@ -6,7 +6,7 @@ teleop_twist_joy:
     publish_stamped_twist: true
 
     axis_linear:
-      x: 3  
+      x: 3
 
     axis_angular:
       yaw: 0

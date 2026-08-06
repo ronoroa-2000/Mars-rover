@@ -14,7 +14,7 @@ class ImuLogger(Node):
 
         self.subscription = self.create_subscription(
             Imu,
-            '/bno055/imu',
+            '/imu',
             self.imu_callback,
             10)
 

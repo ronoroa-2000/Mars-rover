@@ -1,10 +1,10 @@
 {
     "ROS2.distro": "jazzy",
     "python.autoComplete.extraPaths": [
-        "/home/zoro/Mars-rover/install/rover_nav/local/lib/python3.10/dist-packages",
-        "/home/zoro/Mars-rover/install/odrive_can/local/lib/python3.10/dist-packages",
-        "/home/zoro/Mars-rover/install/data_process/lib/python3.10/site-packages",
-        "/home/zoro/Mars-rover/install/bno055/lib/python3.10/site-packages",
+        "/home/zoro/mars-rover/install/rover_nav/local/lib/python3.10/dist-packages",
+        "/home/zoro/mars-rover/install/odrive_can/local/lib/python3.10/dist-packages",
+        "/home/zoro/mars-rover/install/data_process/lib/python3.10/site-packages",
+        "/home/zoro/mars-rover/install/bno055/lib/python3.10/site-packages",
         "/home/zoro/carla_ros_ws/build/rqt_carla_control/src",
         "/home/zoro/carla_ros_ws/install/rqt_carla_control/lib/python3.10/site-packages",
         "/home/zoro/carla_ros_ws/build/carla_waypoint_publisher/src",
@@ -40,10 +40,10 @@
         "/mnt/wd1tb/CARLA/PythonAPI/carla"
     ],
     "python.analysis.extraPaths": [
-        "/home/zoro/Mars-rover/install/rover_nav/local/lib/python3.10/dist-packages",
-        "/home/zoro/Mars-rover/install/odrive_can/local/lib/python3.10/dist-packages",
-        "/home/zoro/Mars-rover/install/data_process/lib/python3.10/site-packages",
-        "/home/zoro/Mars-rover/install/bno055/lib/python3.10/site-packages",
+        "/home/zoro/mars-rover/install/rover_nav/local/lib/python3.10/dist-packages",
+        "/home/zoro/mars-rover/install/odrive_can/local/lib/python3.10/dist-packages",
+        "/home/zoro/mars-rover/install/data_process/lib/python3.10/site-packages",
+        "/home/zoro/mars-rover/install/bno055/lib/python3.10/site-packages",
         "/home/zoro/carla_ros_ws/build/rqt_carla_control/src",
         "/home/zoro/carla_ros_ws/install/rqt_carla_control/lib/python3.10/site-packages",
         "/home/zoro/carla_ros_ws/build/carla_waypoint_publisher/src",
@@ -78,7 +78,7 @@
         "/mnt/wd1tb/CARLA/PythonAPI/carla",
         "/mnt/wd1tb/CARLA/PythonAPI/carla"
     ],
-    "cmake.sourceDirectory": "/home/zoro/Mars-rover/src/rover_controllers",
+    "cmake.sourceDirectory": "/home/zoro/mars-rover/src/rover_controllers",
     "cmake.configureArgs": [
         "-DCMAKE_C_COMPILER=/usr/bin/gcc",
         "-DCMAKE_CXX_COMPILER=/usr/bin/g++"

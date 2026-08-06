@@ -62,7 +62,7 @@ def generate_launch_description():
     ])
 
     world_path = PathJoinSubstitution([
-        FindPackageShare('rover_description'), 'worlds', 'empty_world.sdf'
+        FindPackageShare('rover_description'), 'worlds', 'marsyard.sdf'
     ])
 
     ekf_config_path = PathJoinSubstitution([
@@ -87,7 +87,7 @@ def generate_launch_description():
 
     spawn_x_arg = DeclareLaunchArgument('spawn_x', default_value='0.0', description='Spawn X')
     spawn_y_arg = DeclareLaunchArgument('spawn_y', default_value='0.0', description='Spawn Y')
-    spawn_z_arg = DeclareLaunchArgument('spawn_z', default_value='3.0', description='Spawn Z')
+    spawn_z_arg = DeclareLaunchArgument('spawn_z', default_value='2.50', description='Spawn Z')
 
     # ------------------------------------------------------------------
     # Launch configurations
@@ -106,15 +106,25 @@ def generate_launch_description():
 
     gz_resource_path = EnvironmentVariable('GZ_SIM_RESOURCE_PATH', default_value='')
 
+    try:
+        zed_description_share = get_package_share_directory('zed_description')
+    except PackageNotFoundError:
+        zed_description_share = None
+
+    gz_sim_resource_path_value = [
+        os.path.dirname(rover_description_share), ':',
+        rover_description_share, '/models:',
+        rover_description_share, '/worlds:',
+        os.path.expanduser('~/.gz/fuel'), ':',
+        gz_resource_path
+    ]
+    if zed_description_share is not None:
+        gz_sim_resource_path_value.insert(0, ':')
+        gz_sim_resource_path_value.insert(0, os.path.dirname(zed_description_share))
+
     set_gz_sim_resource_path = SetEnvironmentVariable(
         name='GZ_SIM_RESOURCE_PATH',
-        value=[
-            os.path.dirname(rover_description_share), ':',
-            rover_description_share, '/models:',
-            rover_description_share, '/worlds:',
-            os.path.expanduser('~/.gz/fuel'), ':',
-            gz_resource_path
-        ]
+        value=gz_sim_resource_path_value
     )
 
     # ------------------------------------------------------------------
@@ -336,6 +346,32 @@ def generate_launch_description():
         OnProcessStart(target_action=teleop_node, on_start=[LogInfo(msg='[STARTED] teleop_twist_joy is up')])
     )
 
+    # ------------------------------------------------------------------
+    # Visual odometry  (ZED2i RGB-D, sim only)  — disabled
+    # ------------------------------------------------------------------
+
+    # zed_rgbd_odometry_node = Node(
+    #     package='rtabmap_odom',
+    #     executable='rgbd_odometry',
+    #     name='zed_rgbd_odometry',
+    #     output='screen',
+    #     parameters=[{
+    #         'frame_id': 'base_footprint',
+    #         'odom_frame_id': 'zed_odom',
+    #         'publish_tf': False,
+    #         'approx_sync': True,
+    #         'use_sim_time': use_sim_time,
+    #     }],
+    #     remappings=[
+    #         ('rgb/image', '/zed/left/image_rect_color'),
+    #         ('rgb/camera_info', '/zed/left/camera_info'),
+    #         ('depth/image', '/zed/depth/depth_registered'),
+    #         ('odom', '/zed/odom'),
+    #     ],
+    #     arguments=['--uerror', '--ros-args', '--log-level', 'warn'],
+    #     condition=IfCondition(use_sim)
+    # )
+
     ekf_node = Node(
         package='robot_localization',
         executable='ekf_node',
@@ -388,5 +424,6 @@ def generate_launch_description():
         teleop_started_handler,
 
         # --- State estimation ---
+        # zed_rgbd_odometry_node,  # Visual odometry disabled
         ekf_node,
     ])

@@ -15,6 +15,7 @@
     <xacro:include filename="left_link.xacro" />
     <xacro:include filename="right_link.xacro" />
     <xacro:include filename="rover_control.xacro" />
+    <xacro:include filename="zed2i.xacro"/>
 
     
 
