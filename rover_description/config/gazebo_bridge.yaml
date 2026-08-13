@@ -71,27 +71,27 @@
   gz_type_name:   "gz.msgs.Double"
   direction:      ROS_TO_GZ
 
-- ros_topic_name: "/zed/left/image_rect_color"
-  gz_topic_name:  "/zed/left/image_rect_color"
+- ros_topic_name: "/camera/left/image_rect_color"
+  gz_topic_name:  "/camera/left/image_rect_color"
   ros_type_name:  "sensor_msgs/msg/Image"
   gz_type_name:   "gz.msgs.Image"
   direction:      GZ_TO_ROS
 
 
-- ros_topic_name: "/zed/left/camera_info"
-  gz_topic_name:  "/zed/left/camera_info"
+- ros_topic_name: "/camera/left/camera_info"
+  gz_topic_name:  "/camera/left/camera_info"
   ros_type_name:  "sensor_msgs/msg/CameraInfo"
   gz_type_name:   "gz.msgs.CameraInfo"
   direction:      GZ_TO_ROS
 
-- ros_topic_name: "/zed/depth/camera_info"
-  gz_topic_name:  "/zed/depth/camera_info"
+- ros_topic_name: "/camera/depth/camera_info"
+  gz_topic_name:  "/camera/depth/camera_info"
   ros_type_name:  "sensor_msgs/msg/CameraInfo"
   gz_type_name:   "gz.msgs.CameraInfo"
   direction:      GZ_TO_ROS
 
-- ros_topic_name: "/zed/depth/depth_registered"
-  gz_topic_name:  "/zed/depth/depth_registered"
+- ros_topic_name: "/camera/depth/depth_registered"
+  gz_topic_name:  "/camera/depth/depth_registered"
   ros_type_name:  "sensor_msgs/msg/Image"
   gz_type_name:   "gz.msgs.Image"
   direction:      GZ_TO_ROS

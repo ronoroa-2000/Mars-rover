@@ -34,7 +34,7 @@
     <!-- Enable D435i -->
     <xacro:property name="enable_D435i" value="false"/>
 
-    <!-- Enable ZED 2i -->
-    <xacro:property name="enable_zed2i" value="true"/>
+    <!-- Enable RGB-D camera -->
+    <xacro:property name="enable_rgbd_camera" value="true"/>
 
 </robot>

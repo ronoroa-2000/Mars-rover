@@ -106,11 +106,6 @@ def generate_launch_description():
 
     gz_resource_path = EnvironmentVariable('GZ_SIM_RESOURCE_PATH', default_value='')
 
-    try:
-        zed_description_share = get_package_share_directory('zed_description')
-    except PackageNotFoundError:
-        zed_description_share = None
-
     gz_sim_resource_path_value = [
         os.path.dirname(rover_description_share), ':',
         rover_description_share, '/models:',
@@ -118,9 +113,6 @@ def generate_launch_description():
         os.path.expanduser('~/.gz/fuel'), ':',
         gz_resource_path
     ]
-    if zed_description_share is not None:
-        gz_sim_resource_path_value.insert(0, ':')
-        gz_sim_resource_path_value.insert(0, os.path.dirname(zed_description_share))
 
     set_gz_sim_resource_path = SetEnvironmentVariable(
         name='GZ_SIM_RESOURCE_PATH',
@@ -347,26 +339,26 @@ def generate_launch_description():
     )
 
     # ------------------------------------------------------------------
-    # Visual odometry  (ZED2i RGB-D, sim only)  — disabled
+    # Visual odometry  (RGB-D camera, sim only)  — disabled
     # ------------------------------------------------------------------
 
-    # zed_rgbd_odometry_node = Node(
+    # rgbd_odometry_node = Node(
     #     package='rtabmap_odom',
     #     executable='rgbd_odometry',
-    #     name='zed_rgbd_odometry',
+    #     name='rgbd_odometry',
     #     output='screen',
     #     parameters=[{
     #         'frame_id': 'base_footprint',
-    #         'odom_frame_id': 'zed_odom',
+    #         'odom_frame_id': 'camera_odom',
     #         'publish_tf': False,
     #         'approx_sync': True,
     #         'use_sim_time': use_sim_time,
     #     }],
     #     remappings=[
-    #         ('rgb/image', '/zed/left/image_rect_color'),
-    #         ('rgb/camera_info', '/zed/left/camera_info'),
-    #         ('depth/image', '/zed/depth/depth_registered'),
-    #         ('odom', '/zed/odom'),
+    #         ('rgb/image', '/camera/left/image_rect_color'),
+    #         ('rgb/camera_info', '/camera/left/camera_info'),
+    #         ('depth/image', '/camera/depth/depth_registered'),
+    #         ('odom', '/camera/odom'),
     #     ],
     #     arguments=['--uerror', '--ros-args', '--log-level', 'warn'],
     #     condition=IfCondition(use_sim)
@@ -424,6 +416,6 @@ def generate_launch_description():
         teleop_started_handler,
 
         # --- State estimation ---
-        # zed_rgbd_odometry_node,  # Visual odometry disabled
+        # rgbd_odometry_node,  # Visual odometry disabled
         ekf_node,
     ])

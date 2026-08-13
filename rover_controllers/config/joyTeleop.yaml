@@ -1,6 +1,6 @@
 teleop_twist_joy:
   ros__parameters:
-    enable_button: 7
+    enable_button: 5
     require_enable_button: true
 
     publish_stamped_twist: true

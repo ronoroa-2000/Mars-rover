@@ -1,0 +1,161 @@
+RGB-D MAPPING -> PCD EXPORT -> RVIZ VISUALIZATION -> SCAN-MATCHING LOCALIZATION
+================================================================================
+
+GOAL
+----
+Drive the rover around the Gazebo world, build a 3D point-cloud map from the
+onboard RGB-D camera, save it as a .pcd file, visualize that saved cloud in
+RViz, and later reuse the same map to localize the rover via scan matching.
+The pipeline should carry over to real hardware later with only topic/config
+swaps, not a rewrite.
+
+RELEVANT EXISTING STATE
+------------------------
+- The RGB-D camera (set up when the ZED2i/Stereolabs SDK was stripped out)
+  publishes:
+    /camera/left/image_rect_color
+    /camera/left/camera_info
+    /camera/depth/depth_registered
+    /camera/depth/camera_info
+  bridged from Gazebo via rover_description/config/gazebo_bridge.yaml.
+
+- robot_localization's EKF (rover_nav/config/ekf_config.yaml) already fuses
+  wheel odometry + IMU into /odometry/filtered, publishing the
+  odom -> base_footprint TF. This topic is already relied on elsewhere
+  (rover_nav/scripts/pure_pursuit.py). No node currently publishes a "map"
+  frame -- that's the gap this pipeline fills.
+
+- point_cloud_data/ already exists at the repo root (currently holding an
+  unrelated, pre-baked "terrain mesh -> PCD" workflow used by
+  rover_description/launch/pointcloud_display.launch.xml). Reuse this same
+  directory for the new sensor-built map artifacts, for consistency.
+
+- Manual joystick teleop is already wired into
+  rover_description/launch/my_robot.launch.py -- that's how the rover will
+  be driven during mapping.
+
+- Decision made: use RTAB-Map (ros-jazzy-rtabmap-ros, available via apt, not
+  yet installed) rather than a hand-rolled point-cloud accumulator -- it
+  gives SLAM (loop closure, global optimization) and a built-in
+  localize-against-saved-map mode, which directly covers the "later use it
+  for scan matching" requirement without needing a second tool.
+
+APPROACH
+--------
+RTAB-Map consumes the RGB-D camera for mapping/scan-matching, but uses the
+EKF's /odometry/filtered as its odometry input rather than computing its own
+visual odometry -- this is RTAB-Map's standard "external odometry"
+integration mode, and it reuses the wheel+IMU fusion that already exists
+instead of duplicating it.
+
+TF layering ends up being: map -> odom (published by RTAB-Map) and
+odom -> base_footprint (already published by EKF) -- the same layered
+pattern as a typical 2D nav stack (AMCL + EKF), just in 3D.
+
+1) System dependency
+   Install ros-jazzy-rtabmap-ros (apt meta-package: rtabmap_slam,
+   rtabmap_sync, rtabmap_conversions, rtabmap_msgs, rtabmap_viz,
+   rtabmap_util, rtabmap_rviz_plugins). Add the corresponding exec_depend
+   entries to rover_nav/package.xml (also pcl_ros, needed for step 5).
+
+2) Mapping launch -- rover_nav/launch/mapping.launch.py (new)
+   Assumes my_robot.launch.py (Gazebo + robot + camera bridge + EKF +
+   teleop) is already running separately, same single-responsibility
+   pattern the repo already uses (localization.launch.py is likewise
+   separate from robot bring-up). Brings up:
+     - rtabmap_sync/rgbd_sync: remaps rgb/image:=/camera/left/image_rect_color,
+       rgb/camera_info:=/camera/left/camera_info,
+       depth/image:=/camera/depth/depth_registered, approx_sync:=true
+       -> publishes a combined rgbd_image.
+     - rtabmap_slam/rtabmap: frame_id:=base_footprint, odom_frame_id:=odom,
+       subscribe_rgbd:=true, remap odom:=/odometry/filtered,
+       database_path defaulting to point_cloud_data/rtabmap_map.db,
+       Mem/IncrementalMemory:=true, delete_db_on_start:=true (each mapping
+       run starts clean unless overridden).
+     - rtabmap_viz/rtabmap_viz for live viewing of the map/loop-closures
+       while driving (separate concern from the later static-PCD RViz view
+       in step 5).
+     - Launch args: use_sim_time (default true), database_path, plus the
+       RGBD topic names (defaulted to the sim /camera/... topics) so a real
+       camera swap later is just a remap, not a new file.
+
+3) Driving + capture workflow (operational, not a file)
+   a. ros2 launch rover_description my_robot.launch.py use_sim:=true
+   b. ros2 launch rover_nav mapping.launch.py
+   c. Drive the rover around the world with the joystick to cover the
+      terrain.
+   d. Ctrl-C the mapping launch -- RTAB-Map optimizes and saves
+      point_cloud_data/rtabmap_map.db on shutdown.
+
+4) Export to PCD (one-shot CLI, not a node)
+   rtabmap-export --cloud --output point_cloud_data/rtabmap_map.pcd \
+       point_cloud_data/rtabmap_map.db
+   This applies RTAB-Map's loop-closure-corrected global optimization
+   before flattening to one cloud, instead of naively concatenating raw
+   per-frame clouds.
+
+5) Viewing launch -- rover_nav/launch/view_map.launch.py (new)
+   Mirrors the existing pointcloud_display.launch.xml pattern in
+   rover_description, but no manual z-offset hack is needed since the
+   RTAB-Map cloud is already globally registered:
+     - pcl_ros/pcd_to_pointcloud: file_name:=point_cloud_data/rtabmap_map.pcd,
+       frame_id:=map.
+     - rviz2 launched with a new minimal config
+       rover_nav/rviz/map_view.rviz (Fixed Frame map, Grid + PointCloud2 on
+       /cloud_pcd), following the structure of
+       rover_description/rviz/display_config.rviz.
+     - Add "rviz" to rover_nav/CMakeLists.txt's install(DIRECTORY ...) list
+       (it currently only installs launch and config), matching how
+       rover_description/CMakeLists.txt already installs its rviz
+       directory.
+
+6) Scan-matching localization -- rover_nav/launch/localize.launch.py (new)
+   Same rgbd_sync + rtabmap nodes as mapping, except:
+   Mem/IncrementalMemory:=false (localization-only, no new map data
+   written) and database_path pointing at the already-built
+   point_cloud_data/rtabmap_map.db (loaded read-only). RTAB-Map then
+   continuously scan-matches the live RGB-D stream against the stored map
+   and publishes a corrected map -> odom TF, while EKF keeps publishing
+   odom -> base_footprint as before.
+
+7) Real hardware (noted, not built yet)
+   All three new launch files take the RGBD topic names as launch args,
+   defaulted to the current sim /camera/... topics. The repo already
+   carries an unused rover_description/urdf/d435i.xacro (RealSense D435i
+   dimensions), suggesting that's the intended real camera. Moving to
+   hardware later is just pointing those launch args at the real driver's
+   topics -- no changes to the mapping/export/view/localize logic itself.
+
+FILES TOUCHED (WHEN IMPLEMENTED)
+---------------------------------
+New:
+  rover_nav/launch/mapping.launch.py
+  rover_nav/launch/view_map.launch.py
+  rover_nav/launch/localize.launch.py
+  rover_nav/rviz/map_view.rviz
+
+Modified:
+  rover_nav/package.xml   -- add rtabmap_slam, rtabmap_sync,
+                              rtabmap_conversions, rtabmap_msgs,
+                              rtabmap_viz, pcl_ros exec_depends
+  rover_nav/CMakeLists.txt -- install the new rviz directory
+
+System (needs sudo, run with confirmation):
+  sudo apt install ros-jazzy-rtabmap-ros
+
+VERIFICATION (WHEN IMPLEMENTED)
+---------------------------------
+1. ros2 pkg list | grep rtabmap -- confirms the apt install succeeded.
+2. Bring up my_robot.launch.py + mapping.launch.py; ros2 topic hz
+   /rgbd_image shows synced RGBD data flowing; rtabmap_viz window shows the
+   point cloud building as the rover is driven.
+3. After Ctrl-C, confirm point_cloud_data/rtabmap_map.db exists and has
+   non-trivial size.
+4. Run the rtabmap-export command; confirm
+   point_cloud_data/rtabmap_map.pcd is created.
+5. Launch view_map.launch.py; confirm the point cloud renders in RViz2
+   with Fixed Frame map.
+6. Launch localize.launch.py against the same .db; confirm map -> odom TF
+   is published and tracks sensibly (ros2 run tf2_ros tf2_echo map odom)
+   as the rover moves, and that the .db file does NOT grow (proving it's
+   read-only localization, not remapping).

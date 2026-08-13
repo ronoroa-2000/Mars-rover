@@ -204,28 +204,12 @@ Visualization Manager:
           Alpha: 1
           Show Axes: false
           Show Trail: false
-        zed_camera_center:
+        camera_center:
           Alpha: 1
           Show Axes: false
           Show Trail: false
           Value: true
-        zed_camera_link:
-          Alpha: 1
-          Show Axes: false
-          Show Trail: false
-        zed_left_camera_frame:
-          Alpha: 1
-          Show Axes: false
-          Show Trail: false
-        zed_left_camera_frame_optical:
-          Alpha: 1
-          Show Axes: false
-          Show Trail: false
-        zed_right_camera_frame:
-          Alpha: 1
-          Show Axes: false
-          Show Trail: false
-        zed_right_camera_frame_optical:
+        left_camera_frame_optical:
           Alpha: 1
           Show Axes: false
           Show Trail: false

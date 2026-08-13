@@ -103,6 +103,13 @@
                          raised past rating, confirm ODrive vel_limit and
                          motor/gearbox can sustain this before running)
        Effort limits  : ±5 Nm (motor rated torque)
+
+       CAN node_id -> wheel location (confirmed against physical rover;
+       direction signs below were tuned per-motor, not per-position — they
+       do NOT follow a left/right or front/bogie pattern):
+         node_id 3 -> L_1 (front left)     node_id 2 -> R_1 (front right)
+         node_id 4 -> L_2 (middle left)    node_id 1 -> R_2 (middle right)
+         node_id 5 -> L_3 (rear left)      node_id 0 -> R_3 (rear right)
        ================================================================ -->
   <xacro:unless value="$(arg use_sim)">
 
@@ -114,9 +121,9 @@
       </hardware>
 
       <!-- LEFT WHEELS -->
-      <joint name="L_1_Wheel_Joint">
+      <joint name="L_1_Wheel_Joint"> <!-- front left -->
         <param name="node_id">3</param>
-        <param name="direction">1</param>
+        <param name="direction">-1</param>
         <command_interface name="velocity">
           <param name="min">-50</param>
           <param name="max"> 50</param>
@@ -130,9 +137,9 @@
         <state_interface name="effort"/>
       </joint>
 
-      <joint name="L_2_Wheel_Joint">
+      <joint name="L_2_Wheel_Joint"> <!-- middle left -->
         <param name="node_id">4</param>
-        <param name="direction">1</param>
+        <param name="direction">-1</param>
         <command_interface name="velocity">
           <param name="min">-50</param>
           <param name="max"> 50</param>
@@ -146,7 +153,7 @@
         <state_interface name="effort"/>
       </joint>
 
-      <joint name="L_3_Wheel_Joint">
+      <joint name="L_3_Wheel_Joint"> <!-- rear left -->
         <param name="node_id">5</param>
         <param name="direction">1</param>
         <command_interface name="velocity">
@@ -163,9 +170,9 @@
       </joint>
 
       <!-- RIGHT WHEELS -->
-      <joint name="R_1_Wheel_Joint">
+      <joint name="R_1_Wheel_Joint"> <!-- front right -->
         <param name="node_id">2</param>
-        <param name="direction">-1</param>
+        <param name="direction">1</param>
         <command_interface name="velocity">
           <param name="min">-50</param>
           <param name="max"> 50</param>
@@ -179,9 +186,9 @@
         <state_interface name="effort"/>
       </joint>
 
-      <joint name="R_2_Wheel_Joint">
+      <joint name="R_2_Wheel_Joint"> <!-- middle right -->
         <param name="node_id">1</param>
-        <param name="direction">-1</param>
+        <param name="direction">1</param>
         <command_interface name="velocity">
           <param name="min">-50</param>
           <param name="max"> 50</param>
@@ -195,7 +202,7 @@
         <state_interface name="effort"/>
       </joint>
 
-      <joint name="R_3_Wheel_Joint">
+      <joint name="R_3_Wheel_Joint"> <!-- rear right -->
         <param name="node_id">0</param>
         <param name="direction">-1</param>
         <command_interface name="velocity">

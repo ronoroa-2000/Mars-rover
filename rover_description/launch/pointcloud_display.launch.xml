@@ -1,0 +1,23 @@
+<launch>
+    <!-- Robot model + joint_state_publisher_gui + rviz2 (Fixed Frame: base_footprint) -->
+    <include file="$(find-pkg-share rover_description)/launch/display.launch.xml" />
+
+    <arg name="pcd_file"
+         default="/home/zoro/mars-rover/src/point_cloud_data/terrain_fixed.pcd"
+         description="Path to the terrain .pcd file to publish" />
+
+    <!-- Raw file coordinates are in the terrain's own frame (Z ~0..2.4m, matching
+         my_robot.launch.py's spawn_z=2.5 default). Publish it into a dedicated
+         'terrain' frame rather than base_footprint directly, so it can be
+         offset independently of the robot origin. -->
+    <node pkg="pcl_ros" exec="pcd_to_pointcloud" name="terrain_pcd_publisher" output="screen">
+        <param name="file_name" value="$(var pcd_file)" />
+        <param name="frame_id" value="terrain" />
+    </node>
+
+    <arg name="terrain_z_offset" default="-2.5"
+         description="Z translation (m) from base_footprint to the terrain frame; shifts the cloud down so its ground surface lands near the robot's feet instead of floating above it" />
+
+    <node pkg="tf2_ros" exec="static_transform_publisher" name="terrain_alignment_tf"
+          args="0 0 $(var terrain_z_offset) 0 0 0 base_footprint terrain" />
+</launch>

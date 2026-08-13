@@ -205,6 +205,7 @@ def generate_launch_description():
         executable='imu_restamp.py',
         name='imu_restamp',
         output='screen',
+        remappings=[('/imu', '/imu/data')],
     )
 
     # ------------------------------------------------------------------
