@@ -19,7 +19,7 @@ RELEVANT EXISTING STATE
     /camera/depth/camera_info
   bridged from Gazebo via rover_description/config/gazebo_bridge.yaml.
 
-- robot_localization's EKF (rover_nav/config/ekf_config.yaml) already fuses
+- robot_localization's EKF (navigation/config/ekf_config.yaml) already fuses
   wheel odometry + IMU into /odometry/filtered, publishing the
   odom -> base_footprint TF. This topic is already relied on elsewhere
   (rover_nav/scripts/pure_pursuit.py). No node currently publishes a "map"

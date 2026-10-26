@@ -147,10 +147,6 @@
     <maxVel>0.1</maxVel>
     <fdir1>1 0 0</fdir1>
   </gazebo>
-  
-  <gazebo reference="Lidar_Link">
-    
-  </gazebo>
 
   <!-- Gazebo Plugin for Joint State Publisher -->
   <!-- When ros2_control is active (use_sim=true), only publish passive joints not managed by
@@ -336,15 +332,82 @@
         </plugin>
   </gazebo>
     
-  <gazebo reference="imu_frame">
-      <sensor name="imu_sensor" type="imu">
-          <always_on>1</always_on>
-          <update_rate>100</update_rate>
-          <gz_frame_id>imu_frame</gz_frame_id>
-          <visualize>true</visualize>
-          <topic>/imu</topic>
-      </sensor>
-  </gazebo>
+<gazebo reference="imu_frame">
+    <sensor name="imu_sensor" type="imu">
+        <always_on>1</always_on>
+        <update_rate>100</update_rate>
+        <gz_frame_id>imu_frame</gz_frame_id>
+        <visualize>true</visualize>
+        <topic>/imu</topic>
+
+        <imu>
+            <!-- Gyroscope noise, rad/s (MPU6050-like, after calibration) -->
+            <angular_velocity>
+                <x>
+                    <noise type="gaussian">
+                        <mean>0.0</mean>
+                        <stddev>0.0009</stddev>
+                        <bias_mean>0.0005</bias_mean>
+                        <bias_stddev>0.0001</bias_stddev>
+                        <dynamic_bias_stddev>0.00002</dynamic_bias_stddev>
+                        <dynamic_bias_correlation_time>400.0</dynamic_bias_correlation_time>
+                    </noise>
+                </x>
+                <y> <noise type="gaussian">
+                        <mean>0.0</mean>
+                        <stddev>0.0009</stddev>
+                        <bias_mean>0.0005</bias_mean>
+                        <bias_stddev>0.0001</bias_stddev>
+                        <dynamic_bias_stddev>0.00002</dynamic_bias_stddev>
+                        <dynamic_bias_correlation_time>400.0</dynamic_bias_correlation_time>
+                    </noise>
+                </y>
+                <z> <noise type="gaussian">
+                        <mean>0.0</mean>
+                        <stddev>0.0009</stddev>
+                        <bias_mean>0.0005</bias_mean>
+                        <bias_stddev>0.0001</bias_stddev>
+                        <dynamic_bias_stddev>0.00002</dynamic_bias_stddev>
+                        <dynamic_bias_correlation_time>400.0</dynamic_bias_correlation_time>
+                    </noise>
+                </z>
+            </angular_velocity>
+
+            <!-- Accelerometer noise, m/s² (MPU6050-like, after calibration) -->
+            <linear_acceleration>
+                <x>
+                    <noise type="gaussian">
+                        <mean>0.0</mean>
+                        <stddev>0.04</stddev>
+                        <bias_mean>0.05</bias_mean>
+                        <bias_stddev>0.01</bias_stddev>
+                        <dynamic_bias_stddev>0.002</dynamic_bias_stddev>
+                        <dynamic_bias_correlation_time>300.0</dynamic_bias_correlation_time>
+                    </noise>
+                </x>
+                <y> <noise type="gaussian">
+                        <mean>0.0</mean>
+                        <stddev>0.04</stddev>
+                        <bias_mean>0.05</bias_mean>
+                        <bias_stddev>0.01</bias_stddev>
+                        <dynamic_bias_stddev>0.002</dynamic_bias_stddev>
+                        <dynamic_bias_correlation_time>300.0</dynamic_bias_correlation_time>
+                    </noise> 
+                 </y>
+                <z> <noise type="gaussian">
+                        <mean>0.0</mean>
+                        <stddev>0.04</stddev>
+                        <bias_mean>0.05</bias_mean>
+                        <bias_stddev>0.01</bias_stddev>
+                        <dynamic_bias_stddev>0.002</dynamic_bias_stddev>
+                        <dynamic_bias_correlation_time>300.0</dynamic_bias_correlation_time>
+                    </noise>
+                </z>
+            </linear_acceleration>
+        </imu>
+    </sensor>
+</gazebo>
+
 
 
   <!-- Gazebo Plugin for Diff Drive (disabled when ros2_control handles driving) -->

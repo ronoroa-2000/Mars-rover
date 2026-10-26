@@ -24,7 +24,6 @@ install(PROGRAMS
   # scripts/teleop_keyboard.py
   scripts/trajectory.py
   scripts/imu_to_tf.py
-  scripts/imu_restamp.py
   DESTINATION lib/${PROJECT_NAME}
 )
 

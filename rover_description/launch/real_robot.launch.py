@@ -9,7 +9,7 @@ Brings up the full real-rover stack:
   - rover_controller         (diff_drive_controller, odom TF enabled for RViz)
   - joy_node                 (gamepad input)
   - teleop_twist_joy         (joy → /rover_controller/cmd_vel)
-  - ekf_node                 (robot_localization, rover_nav/config/ekf_config.yaml)
+  - ekf_node                 (robot_localization, navigation/config/ekf_config.yaml)
 
 CAN interface is can0 (hardcoded in rover_control.xacro).
 
@@ -50,7 +50,7 @@ def generate_launch_description():
     ])
 
     ekf_config_yaml = PathJoinSubstitution([
-        FindPackageShare('rover_nav'), 'config', 'ekf_config.yaml'
+        FindPackageShare('navigation'), 'config', 'ekf_config.yaml'
     ])
 
     # ------------------------------------------------------------------
@@ -191,24 +191,6 @@ def generate_launch_description():
     )
 
     # ------------------------------------------------------------------
-    # IMU restamp — the MPU6050/micro-ROS firmware stamps /imu with its
-    # own boot-relative clock, not synced ROS time. ekf_node's predict
-    # step uses message timestamps to compute dt, so mixing that with
-    # /rover_controller/odom's real-time stamps produces a multi-billion
-    # -second dt and blows up /odometry/filtered's x/y to huge garbage
-    # values even at rest. This re-stamps /imu with the host clock
-    # before EKF sees it (see rover_description/scripts/imu_restamp.py).
-    # ------------------------------------------------------------------
-
-    imu_restamp_node = Node(
-        package='rover_description',
-        executable='imu_restamp.py',
-        name='imu_restamp',
-        output='screen',
-        remappings=[('/imu', '/imu/data')],
-    )
-
-    # ------------------------------------------------------------------
     # EKF — fuses wheel odometry + IMU into a filtered odom estimate
     # ------------------------------------------------------------------
 
@@ -237,6 +219,5 @@ def generate_launch_description():
         teleop_node,
 
         # State estimation
-        imu_restamp_node,
         ekf_node,
     ])

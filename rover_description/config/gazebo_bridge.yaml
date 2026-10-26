@@ -71,29 +71,43 @@
   gz_type_name:   "gz.msgs.Double"
   direction:      ROS_TO_GZ
 
-- ros_topic_name: "/camera/left/image_rect_color"
-  gz_topic_name:  "/camera/left/image_rect_color"
-  ros_type_name:  "sensor_msgs/msg/Image"
-  gz_type_name:   "gz.msgs.Image"
-  direction:      GZ_TO_ROS
+# D435i disabled for now (lidar only)
+# - ros_topic_name: "/camera/color/image_raw"
+#   gz_topic_name:  "/camera/color/image_raw"
+#   ros_type_name:  "sensor_msgs/msg/Image"
+#   gz_type_name:   "gz.msgs.Image"
+#   direction:      GZ_TO_ROS
 
 
-- ros_topic_name: "/camera/left/camera_info"
-  gz_topic_name:  "/camera/left/camera_info"
-  ros_type_name:  "sensor_msgs/msg/CameraInfo"
-  gz_type_name:   "gz.msgs.CameraInfo"
+# - ros_topic_name: "/camera/color/camera_info"
+#   gz_topic_name:  "/camera/color/camera_info"
+#   ros_type_name:  "sensor_msgs/msg/CameraInfo"
+#   gz_type_name:   "gz.msgs.CameraInfo"
+#   direction:      GZ_TO_ROS
+
+# - ros_topic_name: "/camera/depth/camera_info"
+#   gz_topic_name:  "/camera/depth/camera_info"
+#   ros_type_name:  "sensor_msgs/msg/CameraInfo"
+#   gz_type_name:   "gz.msgs.CameraInfo"
+#   direction:      GZ_TO_ROS
+
+# - ros_topic_name: "/camera/depth/image_rect_raw"
+#   gz_topic_name:  "/camera/depth/image_rect_raw"
+#   ros_type_name:  "sensor_msgs/msg/Image"
+#   gz_type_name:   "gz.msgs.Image"
+#   direction:      GZ_TO_ROS
+
+# - ros_topic_name: "/camera/depth/image_rect_raw/points"
+#   gz_topic_name:  "/camera/depth/image_rect_raw/points"
+#   ros_type_name:  "sensor_msgs/msg/PointCloud2"
+#   gz_type_name:   "gz.msgs.PointCloudPacked"
+#   direction:      GZ_TO_ROS
+
+- ros_topic_name: "/scan/points"
+  gz_topic_name:  "/scan/points"
+  ros_type_name:  "sensor_msgs/msg/PointCloud2"
+  gz_type_name:   "gz.msgs.PointCloudPacked"
   direction:      GZ_TO_ROS
 
-- ros_topic_name: "/camera/depth/camera_info"
-  gz_topic_name:  "/camera/depth/camera_info"
-  ros_type_name:  "sensor_msgs/msg/CameraInfo"
-  gz_type_name:   "gz.msgs.CameraInfo"
-  direction:      GZ_TO_ROS
-
-- ros_topic_name: "/camera/depth/depth_registered"
-  gz_topic_name:  "/camera/depth/depth_registered"
-  ros_type_name:  "sensor_msgs/msg/Image"
-  gz_type_name:   "gz.msgs.Image"
-  direction:      GZ_TO_ROS
 
 

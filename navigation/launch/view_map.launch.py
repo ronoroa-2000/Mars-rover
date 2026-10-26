@@ -31,7 +31,7 @@ def generate_launch_description():
         output='screen',
         parameters=[{
             'file_name': pcd_file,
-            'frame_id': 'map',
+            'tf_frame': 'map',
         }],
     )
 

@@ -6,3 +6,10 @@ __pycache__/
 *.csv
 .vscode/
 rover_nav/
+
+# Large generated data and meshes (hundreds of MB); keep local, not in git
+point_cloud_data/*
+!point_cloud_data/terrain_world.pcd
+!point_cloud_data/terrain_world_metadata.yaml
+rover_description/models/marsyard_mesh/
+rover_description/worlds/ERC_yard_files/

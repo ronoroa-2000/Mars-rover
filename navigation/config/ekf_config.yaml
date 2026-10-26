@@ -1,0 +1,77 @@
+
+ekf_filter_node:
+  ros__parameters:
+    frequency: 50.0
+    sensor_timeout: 0.1
+    use_sim_time: false
+    permit_correctionless_propagation: true
+    two_d_mode: false
+  
+    
+    map_frame: map
+    odom_frame: odom
+    base_link_frame: base_footprint
+    world_frame: odom
+    publish_tf: true
+    
+    # ============================================
+    # WHEEL ODOMETRY - Position ONLY
+    # ============================================
+    odom0: /rover_controller/odom
+
+    odom0_config: [true,  true,   false,   # x, y, z
+                   false, false, false,   # roll, pitch, yaw
+                   true,  false, false,   # vx only — vy=0 on diff drive suppresses y
+                   false, false, false,   # angular velocities
+                   true, false, false]   # accelerations
+    odom0_differential: true
+    odom0_relative: true
+    odom0_queue_size: 10
+
+    # ============================================
+    # VISUAL ODOMETRY (ZED2i RGB-D) - Position ONLY  — disabled
+    # ============================================
+    # Fused as incremental corrections (differential=true) rather than
+    # absolute position, so it doesn't fight odom0 for frame ownership —
+    # it exists to correct wheel slip on loose terrain, not replace odom0.
+    # odom1: /zed/odom
+
+    # odom1_config: [true,  true,   true,    # x, y, z
+    #                false, false, false,   # roll, pitch, yaw — orientation trusted from IMU instead
+    #                false, false, false,   # vx, vy, vz
+    #                false, false, false,   # angular velocities
+    #                false, false, false]   # accelerations
+    # odom1_differential: true
+    # odom1_relative: false
+    # odom1_queue_size: 10
+
+    # ============================================
+    # IMU - roll/pitch/yaw (absolute) + yaw rate
+    # ============================================
+    imu0: /imu/synced
+    imu0_config: [false, false, false,
+                  true,  true,  true,
+                  false, false, false,
+                  false, false, true,
+                  false, false, false]
+    imu0_differential: false
+    imu0_relative: false
+    imu0_queue_size: 10
+    imu0_remove_gravitational_acceleration: true
+    
+    # Process noise (same as before)
+    process_noise_covariance: [0.05, 0.0,  0.0,  0.0,  0.0,  0.0,  0.0,  0.0,  0.0,  0.0,  0.0,  0.0,  0.0,  0.0,  0.0,
+                                0.0,  0.05, 0.0,  0.0,  0.0,  0.0,  0.0,  0.0,  0.0,  0.0,  0.0,  0.0,  0.0,  0.0,  0.0,
+                                0.0,  0.0,  0.06, 0.0,  0.0,  0.0,  0.0,  0.0,  0.0,  0.0,  0.0,  0.0,  0.0,  0.0,  0.0,
+                                0.0,  0.0,  0.0,  0.03, 0.0,  0.0,  0.0,  0.0,  0.0,  0.0,  0.0,  0.0,  0.0,  0.0,  0.0,
+                                0.0,  0.0,  0.0,  0.0,  0.03, 0.0,  0.0,  0.0,  0.0,  0.0,  0.0,  0.0,  0.0,  0.0,  0.0,
+                                0.0,  0.0,  0.0,  0.0,  0.0,  0.06, 0.0,  0.0,  0.0,  0.0,  0.0,  0.0,  0.0,  0.0,  0.0,
+                                0.0,  0.0,  0.0,  0.0,  0.0,  0.0,  0.025, 0.0,  0.0,  0.0,  0.0,  0.0,  0.0,  0.0,  0.0,
+                                0.0,  0.0,  0.0,  0.0,  0.0,  0.0,  0.0,  0.025, 0.0,  0.0,  0.0,  0.0,  0.0,  0.0,  0.0,
+                                0.0,  0.0,  0.0,  0.0,  0.0,  0.0,  0.0,  0.0,  0.04, 0.0,  0.0,  0.0,  0.0,  0.0,  0.0,
+                                0.0,  0.0,  0.0,  0.0,  0.0,  0.0,  0.0,  0.0,  0.0,  0.01, 0.0,  0.0,  0.0,  0.0,  0.0,
+                                0.0,  0.0,  0.0,  0.0,  0.0,  0.0,  0.0,  0.0,  0.0,  0.0,  0.01, 0.0,  0.0,  0.0,  0.0,
+                                0.0,  0.0,  0.0,  0.0,  0.0,  0.0,  0.0,  0.0,  0.0,  0.0,  0.0,  0.02, 0.0,  0.0,  0.0,
+                                0.0,  0.0,  0.0,  0.0,  0.0,  0.0,  0.0,  0.0,  0.0,  0.0,  0.0,  0.0,  0.01, 0.0,  0.0,
+                                0.0,  0.0,  0.0,  0.0,  0.0,  0.0,  0.0,  0.0,  0.0,  0.0,  0.0,  0.0,  0.0,  0.01, 0.0,
+                                0.0,  0.0,  0.0,  0.0,  0.0,  0.0,  0.0,  0.0,  0.0,  0.0,  0.0,  0.0,  0.0,  0.0,  0.015]

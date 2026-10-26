@@ -1,0 +1,52 @@
+# Lidar-only RTAB-Map parameters, shared by lidar_mapping.launch.py and
+# lidar_localize.launch.py. No camera: registration and loop closure are
+# ICP on the 3D lidar cloud instead of visual features
+# (Reg/Strategy 1, Kp/MaxFeatures -1).
+/**:
+  ros__parameters:
+    subscribe_depth: false
+    subscribe_rgb: false
+    subscribe_rgbd: false
+    subscribe_scan_cloud: true
+    approx_sync: true
+    topic_queue_size: 10
+    sync_queue_size: 10
+    wait_for_transform: 0.2
+
+    # Add a map node every 0.5 m or ~3 deg of turning.
+    RGBD/LinearUpdate: "0.5"
+    RGBD/AngularUpdate: "0.05"
+    # Refine EKF odometry between consecutive nodes with ICP.
+    RGBD/NeighborLinkRefining: "true"
+    # Loop closure by proximity (no images to match on).
+    RGBD/ProximityBySpace: "true"
+    RGBD/ProximityMaxGraphDepth: "0"
+    RGBD/ProximityPathMaxNeighbors: "1"
+    Kp/MaxFeatures: "-1"
+    Reg/Strategy: "1"
+    Reg/Force3DoF: "false"
+    # Gravity constraint from the IMU keeps ICP-refined links from
+    # accumulating pitch/roll error (the map climbing in z).
+    Optimizer/GravitySigma: "0.3"
+
+    # Downsample the 50x1024 cloud before storing/matching.
+    Mem/LaserScanVoxelSize: "0.1"
+    Mem/LaserScanNormalK: "20"
+    Mem/NotLinkedNodesKept: "false"
+
+    Icp/VoxelSize: "0.1"
+    Icp/PointToPlane: "true"
+    Icp/PointToPlaneK: "20"
+    Icp/PointToPlaneRadius: "0"
+    Icp/Iterations: "10"
+    Icp/Epsilon: "0.001"
+    Icp/MaxTranslation: "3"
+    Icp/MaxCorrespondenceDistance: "1.0"
+    Icp/Strategy: "1"
+    Icp/OutlierRatio: "0.7"
+    Icp/CorrespondenceRatio: "0.2"
+
+    # Occupancy grid / cloud_map built from the lidar.
+    Grid/Sensor: "0"
+    Grid/RangeMax: "20"
+    Grid/CellSize: "0.1"

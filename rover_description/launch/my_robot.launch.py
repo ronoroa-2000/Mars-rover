@@ -1,5 +1,5 @@
 import os
-
+ 
 from launch import LaunchDescription
 from launch.actions import (
     DeclareLaunchArgument,
@@ -18,6 +18,7 @@ from launch.substitutions import (
     LaunchConfiguration,
     PathJoinSubstitution,
     EnvironmentVariable,
+    PythonExpression,
 )
 
 from launch.launch_description_sources import PythonLaunchDescriptionSource
@@ -66,7 +67,7 @@ def generate_launch_description():
     ])
 
     ekf_config_path = PathJoinSubstitution([
-        FindPackageShare('rover_nav'), 'config', 'ekf_config.yaml'
+        FindPackageShare('navigation'), 'config', 'ekf_config.yaml'
     ])
 
     # ------------------------------------------------------------------
@@ -85,9 +86,26 @@ def generate_launch_description():
         description='Use Gazebo simulation clock (set false for real robot wall clock)'
     )
 
+    headless_arg = DeclareLaunchArgument(
+        'headless',
+        default_value='false',
+        description='true = Gazebo server only, no GUI window (saves 150%+ CPU, '
+                    'RTF-critical for the NDT pipeline) | false = launch the interactive GUI too'
+    )
+
+    rviz_arg = DeclareLaunchArgument(
+        'rviz',
+        default_value='true',
+        description='true = launch RViz (inherits the NVIDIA PRIME offload env set below)'
+    )
+
     spawn_x_arg = DeclareLaunchArgument('spawn_x', default_value='0.0', description='Spawn X')
     spawn_y_arg = DeclareLaunchArgument('spawn_y', default_value='0.0', description='Spawn Y')
-    spawn_z_arg = DeclareLaunchArgument('spawn_z', default_value='2.50', description='Spawn Z')
+    spawn_z_arg = DeclareLaunchArgument('spawn_z', default_value='0.0', description='Spawn Z')
+    spawn_yaw_arg = DeclareLaunchArgument(
+        'spawn_yaw', default_value='0.0',
+        description='Spawn yaw in radians (0 = facing +X, pi/2 = facing +Y)'
+    )
 
     # ------------------------------------------------------------------
     # Launch configurations
@@ -95,10 +113,12 @@ def generate_launch_description():
 
     use_sim      = LaunchConfiguration('use_sim')
     use_sim_time = LaunchConfiguration('use_sim_time')
+    headless     = LaunchConfiguration('headless')
 
     spawn_x = LaunchConfiguration('spawn_x')
     spawn_y = LaunchConfiguration('spawn_y')
     spawn_z = LaunchConfiguration('spawn_z')
+    spawn_yaw = LaunchConfiguration('spawn_yaw')
 
     # ------------------------------------------------------------------
     # Gazebo resource path
@@ -180,7 +200,23 @@ def generate_launch_description():
         launch_arguments={
             'gz_args': [world_path, ' -r --gui-config ', gz_gui_config_path]
         }.items(),
-        condition=IfCondition(use_sim)
+        condition=IfCondition(PythonExpression([
+            '"', use_sim, '" == "true" and "', headless, '" == "false"'
+        ]))
+    )
+
+    gazebo_launch_headless = IncludeLaunchDescription(
+        PythonLaunchDescriptionSource(
+            PathJoinSubstitution([
+                FindPackageShare('ros_gz_sim'), 'launch', 'gz_sim.launch.py'
+            ])
+        ),
+        launch_arguments={
+            'gz_args': [world_path, ' -s -r']
+        }.items(),
+        condition=IfCondition(PythonExpression([
+            '"', use_sim, '" == "true" and "', headless, '" == "true"'
+        ]))
     )
 
     # ------------------------------------------------------------------
@@ -199,6 +235,7 @@ def generate_launch_description():
             '-x', spawn_x,
             '-y', spawn_y,
             '-z', spawn_z,
+            '-Y', spawn_yaw,
             '-timeout', '30.0',
         ],
         condition=IfCondition(use_sim)
@@ -243,17 +280,28 @@ def generate_launch_description():
     # Controller spawners  (shared between sim and real)
     # ------------------------------------------------------------------
 
+    # Timeouts bumped from the spawner's ~10s defaults: under load (e.g. Gazebo
+    # + NDT + everything else running at once), the controller_manager can take
+    # longer than that to respond to the switch_controller service call, which
+    # kills the spawner even though the controller activates fine right after
+    # (confirmed via `ros2 control list_controllers` after one such crash).
+    spawner_timeout_args = [
+        '--controller-manager-timeout', '30',
+        '--switch-timeout', '30',
+        '--service-call-timeout', '30',
+    ]
+
     joint_state_broadcaster_spawner = Node(
         package='controller_manager',
         executable='spawner',
-        arguments=['joint_state_broadcaster', '--controller-manager', '/controller_manager'],
+        arguments=['joint_state_broadcaster', '--controller-manager', '/controller_manager'] + spawner_timeout_args,
         output='screen'
     )
 
     rover_controller_spawner = Node(
         package='controller_manager',
         executable='spawner',
-        arguments=['rover_controller', '--controller-manager', '/controller_manager'],
+        arguments=['rover_controller', '--controller-manager', '/controller_manager'] + spawner_timeout_args,
         output='screen'
     )
 
@@ -372,6 +420,20 @@ def generate_launch_description():
         parameters=[ekf_config_path, {'use_sim_time': use_sim_time}],
     )
 
+    rviz_config_path = PathJoinSubstitution([
+        FindPackageShare('rover_description'), 'rviz', 'display_config.rviz'
+    ])
+
+    rviz_node = Node(
+        package='rviz2',
+        executable='rviz2',
+        name='rviz2',
+        output='screen',
+        arguments=['-d', rviz_config_path],
+        parameters=[{'use_sim_time': use_sim_time}],
+        condition=IfCondition(LaunchConfiguration('rviz')),
+    )
+
     # ------------------------------------------------------------------
     # Launch description
     # ------------------------------------------------------------------
@@ -381,9 +443,12 @@ def generate_launch_description():
         # Arguments
         use_sim_arg,
         use_sim_time_arg,
+        headless_arg,
+        rviz_arg,
         spawn_x_arg,
         spawn_y_arg,
         spawn_z_arg,
+        spawn_yaw_arg,
 
         # Environment
         set_gz_sim_plugin_path,
@@ -397,6 +462,7 @@ def generate_launch_description():
 
         # --- Simulation only ---
         gazebo_launch,
+        gazebo_launch_headless,
         TimerAction(period=10.0, actions=[spawn_robot_node], condition=IfCondition(use_sim)),
         parameter_bridge_node,
         delay_controllers_after_spawn,
@@ -418,4 +484,7 @@ def generate_launch_description():
         # --- State estimation ---
         # rgbd_odometry_node,  # Visual odometry disabled
         ekf_node,
+
+        # --- Visualization ---
+        rviz_node,
     ])

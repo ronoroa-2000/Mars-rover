@@ -1,7 +1,14 @@
 <sdf version='1.10'>
   <world name='leo_marsyard'>
-    <physics name='1ms' type='ignored'>
-      <max_step_size>0.001</max_step_size>
+    <physics name='2ms' type='ignored'>
+      <!-- Halved physics step rate (1000Hz -> 500Hz): gz sim server was
+      pegging 200%+ CPU and sim real-time factor was measured at ~0.35x
+      under normal pipeline load, which was breaking the NDT pipeline's
+      timestamp-freshness checks (they assume near-real-time operation).
+      Watch rocker-bogie wheel/rock contact behavior for new instability
+      (bouncing, clipping) after this change — if it appears, revert
+      toward 1ms and cut load elsewhere (sensor rate/resolution) instead. -->
+      <max_step_size>0.002</max_step_size>
       <real_time_factor>1</real_time_factor>
       <dart>
         <collision_detector>bullet</collision_detector>
@@ -9,7 +16,7 @@
           <solver_type>dantzig</solver_type>
         </solver>
       </dart>
-      <real_time_update_rate>1000</real_time_update_rate>
+      <real_time_update_rate>500</real_time_update_rate>
     </physics>
     <plugin name='gz::sim::systems::Physics' filename='gz-sim-physics-system'>
       <!-- <engine>
@@ -49,33 +56,23 @@
         <cubemap_uri>dem/milkyway_starry_sky.dds</cubemap_uri>
       </sky>
     </scene> -->
-    <model name='marsyard2022_terrain'>
-      <model name='marsyard2022_terrain'>
+    <model name='marsyard2026_terrain'>
+      <model name='marsyard2026_terrain'>
         <pose>0 0 0 0 0 0</pose>
         <static>true</static>
         <link name='marsyard_terrain'>
           <collision name='terrain_collision'>
             <geometry>
-              <heightmap>
-                <uri>dem/marsyard2022_terrain_hm.tif</uri>
-                <pos>0 0 0</pos>
-                <size>50 50 4.8208032735659998</size>
-              </heightmap>
+              <mesh>
+                <uri>marsyard_mesh/marsyard2026_collision.obj</uri>
+              </mesh>
             </geometry>
           </collision>
           <visual name='terrain_visual'>
             <geometry>
-              <heightmap>
-                <use_terrain_paging>false</use_terrain_paging>
-                <uri>dem/marsyard2022_terrain_hm.tif</uri>
-                <pos>0 0 0</pos>
-                <size>50 50 4.8208032735659998</size>
-                <texture>
-                  <diffuse>dem/marsyard2022_terrain_texture.png</diffuse>
-                  <normal>dem/flat_normal.png</normal>
-                  <size>50</size>
-                </texture>
-              </heightmap>
+              <mesh>
+                <uri>marsyard_mesh/marsyard2026_visual.obj</uri>
+              </mesh>
             </geometry>
           </visual>
         </link>
@@ -83,7 +80,46 @@
       <pose>0 0 0 0 0 0</pose>
       <self_collide>false</self_collide>
     </model>
-   
+
+    <!-- Safety-net ground plane: the heightmap only covers the actual scanned
+         Mars Yard footprint (~37x44m). Outside that rectangle there is no
+         heightmap collision at all, so driving/teleporting past the mapped
+         edge means falling into open space. This plane sits well below the
+         yard's lowest point (elev min approx -0.86) so it never interferes
+         with the yard's own terrain, and only catches the rover if it
+         actually leaves the mapped area. -->
+    <model name='out_of_bounds_ground_plane'>
+      <static>true</static>
+      <pose>0.19 14.02 -3.0 0 0 0</pose>
+      <link name='link'>
+        <collision name='collision'>
+          <geometry>
+            <plane>
+              <normal>0 0 1</normal>
+              <size>400 400</size>
+            </plane>
+          </geometry>
+          <surface>
+            <friction>
+              <ode/>
+            </friction>
+          </surface>
+        </collision>
+        <visual name='visual'>
+          <geometry>
+            <plane>
+              <normal>0 0 1</normal>
+              <size>400 400</size>
+            </plane>
+          </geometry>
+          <material>
+            <ambient>0.2 0.15 0.1 1</ambient>
+            <diffuse>0.25 0.18 0.12 1</diffuse>
+          </material>
+        </visual>
+      </link>
+    </model>
+
     <light name='sun' type='directional'>
       <pose>0 0 10 0 0 0</pose>
       <cast_shadows>true</cast_shadows>

@@ -15,7 +15,9 @@
     <xacro:include filename="left_link.xacro" />
     <xacro:include filename="right_link.xacro" />
     <xacro:include filename="rover_control.xacro" />
-    <xacro:include filename="rgbd_camera.xacro"/>
+    <!-- D435i disabled for now (lidar only) -->
+    <!-- <xacro:include filename="d435i.xacro"/> -->
+    <xacro:include filename="lidar.xacro"/>
 
     
 
